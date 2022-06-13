@@ -1,0 +1,18 @@
+import { createGlobalStyle } from "styled-components";
+
+const GlobalStyle = createGlobalStyle`
+  body {
+    background-color: rgb(85, 170, 170);
+    font-family: "MS Sans Serif";
+    font-size: 12px;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+    color: rgb(51, 51, 51);
+  }
+  
+  main{
+    padding: 15px;
+  }
+`;
+
+export default GlobalStyle;
