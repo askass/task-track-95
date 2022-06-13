@@ -63,8 +63,8 @@ export class Task{
 }
 
 
-let currentTaskId:string;
-let currentTaskStartTime:number;
+let currentTaskId:string ="";
+let currentTaskStartTime:number = -1;
 
 const Home: NextPage = () => {
 
