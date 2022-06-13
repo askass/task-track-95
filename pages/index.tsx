@@ -4,7 +4,7 @@ import { Button , ThemeProvider, TitleBar, Frame, Fieldset, Input } from '@react
 import '@react95/icons/icons.css';
 import styled from "styled-components";
 import { useState, useRef,useEffect } from "react";
-import uuid from "react-uuid";
+import { v4 as uuidv4 } from 'uuid';
 import {HistoryItemsList} from "../Components/HistoryItemsList";
 
 export const Timer = styled.p`
@@ -36,7 +36,7 @@ export class Task{
   startTime: number;
   endTime:number = 0;
   name: string;
-  id: number;
+  id: string;
   running: boolean;
   workedTime: number = 0;
 
@@ -44,7 +44,7 @@ export class Task{
     this.name = name;
     this.running = running;
     this.startTime = new Date().getTime();
-    this.id = uuid()
+    this.id = uuidv4()
   }
 
   setEndTime(){
@@ -63,19 +63,20 @@ export class Task{
 }
 
 
-let currentTaskId:number;
+let currentTaskId:string;
 let currentTaskStartTime:number;
 
 const Home: NextPage = () => {
 
  
 
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   const [track, setTrack] = useState(false);
   const [time, setTime] = useState("00:00:00");
   const [total, setTotal] = useState("00:00:00");
+  const [mname, setMname] = useState("");
  
-  const taskInput =  useRef();
+
   
   function formatTime(numMls:number):string {
     return new Date(numMls).toISOString().slice(11,19)
@@ -100,18 +101,20 @@ const Home: NextPage = () => {
 
   function handleLFGClick(){
    
-    if(!currentTaskId && !currentTaskStartTime){
-      let currentTask = new Task(taskInput.current?.value, true)
-      setTasks([
+    if(currentTaskId==="" && currentTaskStartTime === -1){
+      let currentTask = new Task( mname, true)
+      let arr = [
         ...tasks,
         currentTask
-      ]);
+      ]
+      setTasks(arr);
       currentTaskId = currentTask.id
       currentTaskStartTime = currentTask.startTime
       setTrack(true);
     }else{
-      let n = getCurrentTaskById(currentTaskId);
-      restartTaskTrack(n);
+      let n = getCurrentTaskId(currentTaskId);
+      if(n !== -1)
+      restartTaskTrack(tasks[n]);
       
     } 
     
@@ -119,14 +122,14 @@ const Home: NextPage = () => {
 
   function restartTaskTrack(task:Task){
     if(task){
-      if(currentTaskId && currentTaskStartTime){
+      if(currentTaskId !=="" && currentTaskStartTime !== -1){
         handleStopClick();
         setTasks([...tasks])
       }
       
       currentTaskId = task.id
       currentTaskStartTime = task.startTime
-      taskInput.current.value = task.name;
+      setMname(task.name);
       currentTaskStartTime = Date.now() - task.workedTime;
       task.startAgain();
       setTime(formatTime(task.workedTime))
@@ -134,27 +137,27 @@ const Home: NextPage = () => {
     }
   }
 
-  function getCurrentTaskById(id:number):Task|boolean{
-    let tsk:Task|boolean = false;
-    tasks.forEach((task)=>{
+  function getCurrentTaskId(id:string):number{
+    let ind:number = -1;
+    tasks.forEach((task, index)=>{
       if(task.id == id){
-        tsk = task;
+        ind = index;
         return;
       }
     })
-    return tsk;
+    return ind;
   }
 
   function handleStopClick(){
-    let n = getCurrentTaskById(currentTaskId);
-    if(n){
-      n.setEndTime();
-      n.name = taskInput.current.value;
+    let n = getCurrentTaskId(currentTaskId);
+    if(n !== -1){
+      tasks[n].setEndTime();
+      tasks[n].name = mname;
     }
-    currentTaskId = null;
-    currentTaskStartTime= null;
+    currentTaskId = "";
+    currentTaskStartTime= -1;
 
-    taskInput.current.value = "";
+    setMname("");
     setTime("00:00:00");
     updateTotal()
     setTrack(false);
@@ -176,7 +179,7 @@ const Home: NextPage = () => {
         restartTaskTrack(tasks[index]);
   }
 
-  function handleRemoveBtn(id:number){
+  function handleRemoveBtn(id:string){
     setTasks(
       tasks.filter((task:Task) => {
         return task.id !== id;
@@ -214,7 +217,7 @@ const Home: NextPage = () => {
           <br/>
           <Frame w={350} style={{ padding: '1em'}}>
             <Fieldset legend="Current Task" style={{ marginTop: '0.5em'}}  >
-              <Input ref={taskInput} style={{ marginTop: '0.5em',width:'95%' }}
+              <Input value={mname} onChange={(e:any)=>setMname(e.target.value)} style={{ marginTop: '0.5em',width:'95%' }}
                 id="#wauwf"
                 type="text"
                 placeholder="What are you working for?" />

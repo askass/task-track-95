@@ -15,12 +15,13 @@
     "next": "12.1.6",
     "react": "18.1.0",
     "react-dom": "18.1.0",
-    "react-uuid": "^1.0.2"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@types/node": "17.0.42",
     "@types/react": "18.0.12",
     "@types/react-dom": "18.0.5",
+    "@types/uuid": "^8.3.4",
     "autoprefixer": "^10.4.7",
     "babel-plugin-styled-components": "^2.0.7",
     "eslint": "8.17.0",

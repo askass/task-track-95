@@ -48,7 +48,7 @@ const Btn =  styled.button`
 `;
 
 
-export function HistoryItemsList({tasks, resume, remove, edit}){
+export function HistoryItemsList({tasks, resume, remove, edit}:{tasks:Task[], resume:any, remove:any, edit:any  }){
 
     return (
         <>
