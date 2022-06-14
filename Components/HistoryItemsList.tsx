@@ -68,7 +68,8 @@ export function HistoryItemsList({tasks, resume, remove, edit}:{tasks:Task[], re
                                         remove(val.id);
                                         }}>✖</Btn>
 
-                                    <TaskInput type="text" defaultValue={val.name} 
+                                    <TaskInput type="text"  defaultValue={val.name}
+                                        placeholder="Edit" 
                                         onChange={(e) =>edit(e.target.value, array.length - 1 - index)}/> 
 
                                     <p style={{ textAlign: 'right' }}>{new Date(val.workedTime).toISOString().slice(11,19)}</p>
