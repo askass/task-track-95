@@ -75,6 +75,33 @@ const Home: NextPage = () => {
   const [time, setTime] = useState("00:00:00");
   const [total, setTotal] = useState("00:00:00");
   const [mname, setMname] = useState("");
+
+
+  function saveBackupToLocalStorage(){
+    localStorage.setItem("tasks", JSON.stringify(tasks)); 
+  }
+
+  function loadBackupFromLocalStorage(){
+    const tempItems = localStorage.getItem("tasks");
+    const mTasks:Task[] = (tempItems ? JSON.parse(tempItems) : []) as Task[];
+    mTasks.forEach((task)=>{
+        Object.setPrototypeOf(task, Task.prototype)
+        if(task.running){
+          currentTaskId = task.id
+          setMname(task.name);
+          currentTaskStartTime = task.startTime - task.workedTime;
+          setTime(formatTime(Date.now() - task.startTime + task.workedTime))
+          setTrack(true);
+          return;
+        }
+    })
+    console.log(mTasks);
+    setTasks(mTasks);
+  }
+
+  useEffect(()=>{
+    loadBackupFromLocalStorage();
+  },[]);
  
 
   
@@ -94,8 +121,9 @@ const Home: NextPage = () => {
 
   
   useEffect(() => {
-    updateTotal()
-    
+    updateTotal();
+    saveBackupToLocalStorage();
+    console.log(tasks);
   }, [tasks]);
   
 
@@ -114,8 +142,7 @@ const Home: NextPage = () => {
     }else{
       let n = getCurrentTaskId(currentTaskId);
       if(n !== -1)
-      restartTaskTrack(tasks[n]);
-      
+      restartTaskTrack(tasks[n]);   
     } 
     
   }
@@ -128,12 +155,12 @@ const Home: NextPage = () => {
       }
       
       currentTaskId = task.id
-      currentTaskStartTime = task.startTime
       setMname(task.name);
       currentTaskStartTime = Date.now() - task.workedTime;
       task.startAgain();
       setTime(formatTime(task.workedTime))
       setTrack(true);
+      saveBackupToLocalStorage();
     }
   }
 
@@ -161,6 +188,7 @@ const Home: NextPage = () => {
     setTime("00:00:00");
     updateTotal()
     setTrack(false);
+    saveBackupToLocalStorage();
   }
 
   function updateTotal(){
@@ -190,6 +218,7 @@ const Home: NextPage = () => {
 
   function handleNameChange(name:string, index:number){
     tasks[index].name = name;
+    saveBackupToLocalStorage();
   }
 
   function handleClear(){
